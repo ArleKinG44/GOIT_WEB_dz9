@@ -1,26 +1,22 @@
-from bson import json_util
-from mongoengine import connect, Document, StringField, ListField, ReferenceField, BooleanField, CASCADE 
+from mongoengine import *
 
 
-connect(db='hw', host = "mongodb://localhost:27017")
+uri = "mongodb+srv://goitlearn:goit_web_db_mongodb@cluster0.sgtae2n.mongodb.net/hw_09?retryWrites=true&w=majority"
+
+connect(host=uri, ssl=True)
 
 
 class Author(Document):
-    fullname = StringField(required=True)
+    fullname = StringField(max_length=50)
     born_date = StringField(max_length=50)
     born_location = StringField(max_length=150)
-    description = StringField()
-    meta = {"collection": "autors"}
+    description = (
+        StringField()
+    )
 
 
 class Quote(Document):
-    author = ReferenceField(Author revers_delete_rule = CASCADE)
-    tags = ListField(StringField(max_length=15))
+    tags = ListField(max_length=50)
+    author = ReferenceField(Author, reverse_delete_rule=CASCADE)
     quote = StringField()
-    meta = {"collection": "quotes"}
-
-    def to_json(self, *args, **kwargs):
-        data = self.to_mongo(*args: *args, **kwargs)
-        data["author"] = self.author.fullname
-        return json_util.dumps(data, ensure_ascii=False)
-    
+    meta = {"allow_inheritance": True}
